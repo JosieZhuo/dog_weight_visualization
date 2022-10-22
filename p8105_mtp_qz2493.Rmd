@@ -1,0 +1,11 @@
+---
+title: "p8105_mtp_qz2493.Rmd"
+author: "Qingyue Zhuo qz2493"
+date: "2022-10-22"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
