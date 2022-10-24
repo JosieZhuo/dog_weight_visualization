@@ -12,7 +12,9 @@ library(dplyr)
 library(readxl)
 library(patchwork)
 library(gridExtra)
+library(viridis)
 
+options(tibble.print_min = 3)
 knitr::opts_chunk$set(
 	echo = TRUE,
 	warning = FALSE,
@@ -30,7 +32,7 @@ scale_fill_discrete = scale_fill_viridis_d
 ```
 
 ### Problem 1
-The raw data records the weight of three dogs - Raisin, Simone, Gagne from 2018 to 2022, together with a standard object and occasional notes. The goal of this report includes tidying and restructuring the data set into a more readable manner; describing the statistical features of the data set; and visualizing the the distribution and trend of dogs' weight.
+The raw data records the weight of three dogs - Raisin, Simone, Gagne from 2018 to 2022, together with a the weight of a standard object and occasional notes. The goal of this report includes tidying and restructuring the data set into a more readable manner; describing the statistical features of the data set; and visualizing the distribution and trend of dogs' weight.
 
 #### import and tidy the data
 After loading the raw data, I converted the format of "date" variable from "day-counts" to "year-month-date" with as.POSIXlt() function. 
@@ -39,7 +41,7 @@ total_df =
   read_excel("dogweights_07may2022.xlsx", skip = 1) %>%
   janitor::clean_names() %>%
   
-  # reorganize the "Date" variable
+  # reorganize the "date" variable
   mutate(
     date = as.POSIXlt.numeric(as.numeric(date)*24*60*60, tz = "UTC", origin = "1899-12-30"),
     date = as.character(date),
@@ -75,7 +77,7 @@ weight_df =
 weight_df 
 ```
 
-The second dataset contains the notes and date on which they are written.
+The second dataset contains notes and the date on which they were written.
 ```{r}
 note_df = 
   select(total_df, date, x6) %>%
@@ -96,30 +98,38 @@ write_csv(note_df,"note.csv")
 weight_data = read_csv("weight_data.csv")
 note_data = read_csv("note.csv")
 ```
-
+The resulting weight dataset contains  `r nrow(weight_data)` observations of `r ncol(weight_data)` variables including `r names(weight_data)`. There are 360 unique dates that are non-NA.
 ```{r}
-#the number of distinct date
+# number of distinct date
 weight_data %>% 
-  select(date)
+  select(date) %>%
   distinct 
-#the number of date that is non-NA
+  
+# number of date that is non-NA
 sum(!is.na(weight_data$date))
 ```
 
+I applied pivot_longer to incorperated three dogs and standard object into a new variable named "dog", and their weights are stored in another variable called "weight", after which I grouped the dogs by name and obtained the number of observations as well as mean and standard deviations by dog categories.
 ```{r}
 weight_data %>%
+  
+  # create new variables of "dog name" and "dog weights"
   pivot_longer(
     raisin:std,
     names_to = "dog",
     values_to = "weight"
   ) %>%
+  
+  # group dogs by name
   arrange(dog) %>%
   group_by(dog) %>%
   summarize(
     total_observations = sum(!is.na(weight)),
-    mean = mean(weight,na.rm = TRUE),
-    standard_deviation = sd(weight, na.rm = TRUE)
+    mean = round(mean(weight,na.rm = TRUE),3),
+    standard_deviation = round(sd(weight, na.rm = TRUE),3)
 ) %>%
+  
+  # generate a well-formatted table
   knitr::kable()
 ```
 
@@ -131,19 +141,33 @@ weight_data_pivot =
   pivot_longer(
     raisin:std,
     names_to = "dog",
-    values_to = "weight"
-  )
-
+    values_to = "weight")
 ```
+
+I generated a boxplot to display the distribution of weights for each dog. We can conclude that Raisin weighs most, with average weight around 18 lbs, while Gagne and Simone weight less and similarly, with average weight around 10 lbs. Besides, Simon's weight has greatest variance. 
 
 ```{r}
 plot1 =
-  ggplot(weight_data_pivot, aes(x = dog, y = weight, color = dog)) + geom_boxplot()
+  ggplot(weight_data_pivot, aes(x = dog, y = weight, fill = dog)) +
+  geom_boxplot() +
+  scale_fill_viridis(discrete = TRUE, alpha = 0.6) +
+  labs(
+    title = "Distribution of Dog Weights",
+    y = "weight (lbs)")
+```
 
+I then created a scatter plot to show each dog's weight over time. We can conclude that dog's weight has a decreasing trend since 2018 as they get older. Gagne's weight dropped rapidly during the last six month of life. For Raisin and Simone, their weight almost follow the same the fluctuation pattern: they both underwent a weight decrease period after their company- Gagne died; 
+```{r}
 plot2 = 
   ggplot(weight_data_pivot, aes(x = date, y = weight, color = dog)) + 
-  geom_smooth(se = FALSE) 
-
-grid.arrange(plot1, plot2, nrow = 1)
+  geom_smooth(se = FALSE, alpha = .5) +
+  geom_point(aes(color = dog), alpha = .5) +
+  labs(
+    title = "Weight over Time",
+    x = "date",
+    y = "weight (lbs)")
+  
+combined_plot = grid.arrange(plot1, plot2, nrow = 1)
+ggsave("dog_weight_plot.pdf", combined_plot, width = 8, height = 5)
 ```
 
