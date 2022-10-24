@@ -14,10 +14,8 @@ library(patchwork)
 library(gridExtra)
 ```
 
-###problem 1
-####
-
-###import and tidy the dataset
+### Problem 1
+The raw data records the weight of three dogs-Raisin, Simone, Gagne from 2018 to 2022, together with a standard object. The goal of this report includes tidying and restructuring the data set into a more readable way; describing the statistical features of the dataset; and visualizing the the distribution and trend of weights for each dog.
 ```{r}
 total_df = 
   read_excel("dogweights_07may2022.xlsx", skip = 1) %>%
@@ -56,7 +54,7 @@ write_csv(weight_df, "weight_data.csv")
 write_csv(note_df,"note.csv")
 ```
 
-###Problem 2
+### Problem 2
 ```{r}
 weight_data = read_csv("weight_data.csv")
 note_data = read_csv("note.csv")
@@ -87,7 +85,9 @@ weight_data %>%
 ) %>%
   knitr::kable()
 ```
-###Problem 3
+
+
+### Problem 3
 ```{r}
 weight_data_pivot = 
   weight_data %>%
