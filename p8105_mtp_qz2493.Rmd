@@ -31,7 +31,7 @@ scale_fill_discrete = scale_fill_viridis_d
 ```
 
 ### Problem 1
-The raw data records the weight of three dogs - Raisin, Simone, and Gagne from 2018 to 2022, together with the weight of a standard object and occasional notes. The goal of this report includes  
+The raw data records the weight of three dogs - Raisin, Simone, and Gagne from 2018 to 2022, together with the weight of a standard object and occasional notes. The goal of this report includes:  
 1. Tidy and restructure the dataset into a more readable version  
 2. Describe the statistical features of the dataset  
 3. Visualize the distribution and trend of dogs' weight
@@ -51,9 +51,9 @@ total_df =
     ) 
 ```
 
-The first dataframe contains the weight of dogs overtime. I unified the unit of weight to "lbs" to increase consistency. I corrected two measurement/recording errors in the table after comparing them with other observations  
-1. Raisin's weight should be 17.9375 rather than 7.375 pounds on 14-Aug-2019  
-2. Weight of the standard object should be 21.027 instead of 29.625 pounds on 25-Apr-2022
+The first dataframe contains the weight of dogs overtime. I unified the unit of weight to "lbs" to increase consistency. I corrected two measurement/recording errors in the table after comparing them with other observations:  
+1. Raisin's weight should be 17.9375 rather than 7.375 pounds on 14-Aug-2019.  
+2. Weight of the standard object should be 21.027 instead of 29.625 pounds on 25-Apr-2022.
 ```{r}
 weight_df =
   select(total_df, date:std) %>%
@@ -116,7 +116,8 @@ weight_data %>%
 sum(!is.na(weight_data$date))
 ```
 #### generate table of observation counts, mean, and standard deviation
-I applied pivot_longer to incorperate three dogs and the standard object into a new variable named "dog". Their weights were stored in another new variable called "weight". I grouped the dogs by name and obtained the number of observations as well as mean and standard deviations of each dog.
+I applied pivot_longer to incorperate three dogs and the standard object into a new variable named "dog". Their weights were stored in another new variable called "weight".  
+I grouped the dogs by name and obtained the number of observations as well as mean and standard deviations of each dog.
 ```{r}
 weight_data %>%
   
@@ -151,7 +152,7 @@ weight_data_pivot =
 ```
 #### create boxplot of weights distribution
 I generated a boxplot to display the distribution of weight for each dog. We can conclude from the plot that  
-1. Raisin weighs the most, with an average weight of around 18 lbs, while Gagne and Simone weigh less and similarly, with an average weight of around 10 lbs  
+1. Raisin weighs the most, with an average weight of around 18 lbs, while Gagne and Simone weigh less and similarly, with an average weight of around 10 lbs.  
 2. Simon's weight has the greatest variance as its boxplot spread out the most. Gagne's weight has the smallest variance, it might be because Gagne has minimal data recorded.
 
 ```{r}
@@ -165,10 +166,10 @@ plot1 =
 ```
 #### generate scatter plot of weight over time
 I created a scatter plot to show each dog's weight over time. We can conclude that  
-1. Dogs' weight decreased gradually since 2018 as they got older. Gagne's weight dropped rapidly during the last six months of his life. Simone's weight dropped smoothly upon being diagnosed with a neurological problem at the beginning of 2021  
-2. For Raisin and Simone, their weights follow a similar fluctuation pattern. For example, they both underwent a weight decrease after their company Gagne died; a weight increase during the first half of 2021 followed by a decrease in the next six months  
-3. According to the notes, Dogs' weight tends to decrease at Weber's or the kennel, and increase at PC  
-4. In conclusion, as an important indicator of health and well-being, a dog's weight is affected by both internal(physical health) and external factors(location, other dogs).
+1. Dogs' weight decreased gradually since 2018 as they got older. Gagne's weight dropped rapidly during the last six months of his life. Simone's weight dropped smoothly upon being diagnosed with a neurological problem at the beginning of 2021.  
+2. For Raisin and Simone, their weights follow a similar fluctuation pattern. For example, they both underwent a weight decrease after their company Gagne died; a weight increase during the first half of 2021 followed by a decrease in the next six months.  
+3. According to the notes, dogs' weight tends to decrease at Weber's or the kennel, and increase at PC.  
+4. In conclusion, as an important indicator of health and well-being, a dog's weight is affected by both internal(physical health) and external(location, other dogs) factors.
 ```{r}
 plot2 = 
   ggplot(weight_data_pivot, aes(x = date, y = weight, color = dog)) + 
